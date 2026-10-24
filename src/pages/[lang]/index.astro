@@ -1,0 +1,231 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { SITE, IMG, STATS } from '../../data/site';
+import { featuredProducts, PRODUCTS } from '../../data/products';
+import { locales, localePath, useTranslations, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
+
+const featured = featuredProducts();
+
+const valueProps = [
+  {
+    icon: 'factory',
+    title: tr('自有工厂直供', 'Own factory, direct supply'),
+    text: tr(
+      '从纺丝、加弹到加捻全流程自主生产，减少中间环节，价格与交期更可控。',
+      'Spinning, texturing and twisting are all done in-house, removing middlemen so price and lead time stay under control.'
+    )
+  },
+  {
+    icon: 'shield',
+    title: tr('批次稳定品质', 'Batch-stable quality'),
+    text: tr(
+      '每批次留样并抽检强力、条干、含油率等指标，可配合 SGS / BV 第三方检测。',
+      'Every batch is sampled and tested for tenacity, evenness and oil pickup; third-party testing by SGS / BV is supported.'
+    )
+  },
+  {
+    icon: 'layers',
+    title: tr('灵活起订量', 'Flexible MOQ'),
+    text: tr(
+      '支持多品种混装一个柜，样品与试单友好，可协助客户开发新品打样。',
+      'Mixed container loading across varieties, sample-friendly trial orders, and support for new product development.'
+    )
+  },
+  {
+    icon: 'globe',
+    title: tr('出口经验成熟', 'Experienced in export'),
+    text: tr(
+      '熟悉 FOB / CIF 条款与全套出口单证，客户遍及 30 多个国家和地区。',
+      'Familiar with FOB / CIF terms and full export documentation, serving customers in over 30 countries and regions.'
+    )
+  }
+];
+
+const certifications = [
+  { name: 'ISO 9001', note: tr('质量管理体系', 'Quality management') },
+  { name: 'GRS', note: tr('再生纤维认证', 'Recycled fiber certification') },
+  { name: 'OEKO-TEX', note: tr('生态纺织品（待确认）', 'Eco textiles (to confirm)') },
+  { name: 'SGS / BV', note: tr('第三方检测报告', 'Third-party test reports') }
+];
+---
+
+<Layout
+  lang={lang}
+  path="/"
+  title={tr('化纤长丝与纱线出口制造商', 'Chemical Fiber Yarn Manufacturer & Exporter')}
+  description={tr(
+    '河北菲泊丝化纤材料有限公司 —— 自有工厂生产涤纶 DTY、FDY、POY、缝纫线、锦纶与氨纶包覆纱，稳定品质、灵活起订、全套出口单证。',
+    'Hebei Feberes Chemical Fiber Materials Co., Ltd. — own-factory producer of polyester DTY / FDY / POY, sewing thread, nylon and spandex covered yarn, with stable quality and full export documentation.'
+  )}
+>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-media">
+      <img src={IMG.hero} alt="" aria-hidden="true" />
+    </div>
+    <div class="container hero-inner">
+      <span class="hero-badge">{tr('自有工厂 · 直接出口 · 支持混柜', 'OWN FACTORY · DIRECT EXPORT · MIXED LOADING')}</span>
+      <h1>
+        {tr('化纤长丝与纱线', 'Chemical Fiber Yarn')}<br />
+        <em>{tr('一站式出口供应商', 'One-stop Export Supplier')}</em>
+      </h1>
+      <p class="lead">
+        {tr(
+          `${SITE.name.zh}位于河北，自有生产基地，专业生产涤纶 DTY / FDY / POY、涤纶缝纫线、锦纶弹力丝与氨纶包覆纱，为全球客户提供稳定品质与有竞争力的价格。`,
+          `${SITE.name.en} is based in Hebei, China and produces polyester DTY / FDY / POY, polyester sewing thread, nylon DTY and spandex covered yarn in our own facility — delivering stable quality at competitive prices to customers worldwide.`
+        )}
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-accent" href={localePath(lang, '/products')}>
+          {t('common.viewAllProducts')}
+          <Icon name="arrow-right" size={18} />
+        </a>
+        <a class="btn btn-ghost" href={localePath(lang, '/contact')}>{t('common.requestQuote')}</a>
+      </div>
+      <ul class="hero-points">
+        <li><Icon name="check" size={17} />{tr('20,000㎡ 生产基地', '20,000㎡ production base')}</li>
+        <li><Icon name="check" size={17} />{tr('30+ 国家出口经验', 'Exporting to 30+ countries')}</li>
+        <li><Icon name="check" size={17} />{tr('样品与试单友好', 'Sample & trial order friendly')}</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="section-dark section-sm">
+    <div class="container">
+      <div class="stats">
+        {STATS.map((s) => (
+          <div class="stat">
+            <b>{s.value}</b>
+            <span>{s.label[lang]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured products -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head center">
+        <span class="eyebrow">{tr('产品中心', 'Products')}</span>
+        <h2 class="section-title">{tr('主营产品', 'Main Products')}</h2>
+        <p class="section-sub">
+          {tr(
+            '覆盖涤纶长丝、缝纫线、锦纶、氨纶包覆纱与再生环保纱线，可整柜也可多品种混装。',
+            'Covering polyester filament, sewing thread, nylon, spandex covered yarn and recycled yarn — full container or mixed loading.'
+          )}
+        </p>
+      </div>
+
+      <div class="grid grid-4">
+        {featured.map((p) => (
+          <ProductCard product={p} lang={lang} />
+        ))}
+      </div>
+
+      <div class="section-foot">
+        <a class="btn btn-outline" href={localePath(lang, '/products')}>
+          {t('common.viewAllProducts')}
+          <Icon name="arrow-right" size={18} />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why us -->
+  <section class="section section-soft">
+    <div class="container">
+      <div class="section-head center">
+        <span class="eyebrow">{tr('为什么选择我们', 'Why Choose Us')}</span>
+        <h2 class="section-title">{tr('工厂实力决定供货稳定性', 'Factory Strength Drives Supply Stability')}</h2>
+        <p class="section-sub">
+          {tr(
+            '从原料到成品全流程可控，让价格、品质与交期都更可预期。',
+            'Full process control from raw material to finished yarn makes price, quality and lead time more predictable.'
+          )}
+        </p>
+      </div>
+
+      <div class="grid grid-4">
+        {valueProps.map((f) => (
+          <div class="card feature">
+            <div class="feature-icon"><Icon name={f.icon} size={24} /></div>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Factory split -->
+  <section class="section">
+    <div class="container split">
+      <div class="split-media">
+        <img src={IMG.lineDTY} alt={tr('加弹车间', 'Texturing workshop')} loading="lazy" />
+      </div>
+      <div>
+        <span class="eyebrow">{tr('工厂实力', 'Our Factory')}</span>
+        <h2>{tr('从加弹到质检的全流程产线', 'From Texturing to Quality Control')}</h2>
+        <p class="section-sub">
+          {tr(
+            '厂区配备高速纺丝线、加弹机、倍捻机与自动络筒设备，配套独立质检实验室，对每批产品进行留样与指标抽检。',
+            'Our plant is equipped with high-speed spinning lines, texturing machines, two-for-one twisters and automatic winders, plus an in-house laboratory that samples and tests every batch.'
+          )}
+        </p>
+        <ul class="check-list">
+          <li><Icon name="check" size={17} />{tr('高速纺丝线 + DTY 加弹机', 'High-speed spinning lines + DTY texturing machines')}</li>
+          <li><Icon name="check" size={17} />{tr('倍捻 / 网络加工能力', 'Twisting and intermingling capability')}</li>
+          <li><Icon name="check" size={17} />{tr('独立质检实验室与留样制度', 'In-house laboratory with batch sample retention')}</li>
+          <li><Icon name="check" size={17} />{tr('成品仓与出口装箱团队', 'Finished-goods warehouse and export loading team')}</li>
+        </ul>
+        <div style="margin-top:28px">
+          <a class="btn btn-primary" href={localePath(lang, '/factory')}>
+            {t('footer.factory')}
+            <Icon name="arrow-right" size={18} />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certifications -->
+  <section class="section section-soft">
+    <div class="container">
+      <div class="section-head center">
+        <span class="eyebrow">{tr('资质与认证', 'Certifications')}</span>
+        <h2 class="section-title">{tr('品质承诺与合规文件', 'Quality Commitment & Compliance')}</h2>
+        <p class="section-sub">
+          {tr(
+            '可按客户要求提供检测报告、认证证书与出口单证。以下为示范占位，请替换为真实证书扫描件。',
+            'Test reports, certificates and export documents are available on request. Items below are placeholders to be replaced with scanned originals.'
+          )}
+        </p>
+      </div>
+
+      <div class="grid grid-4">
+        {certifications.map((c) => (
+          <div class="card" style="padding:26px;text-align:center">
+            <div class="feature-icon" style="margin:0 auto 16px"><Icon name="award" size={24} /></div>
+            <h3 style="font-size:17px">{c.name}</h3>
+            <p style="margin-top:8px;font-size:14px;color:var(--ink-3)">{c.note}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</Layout>

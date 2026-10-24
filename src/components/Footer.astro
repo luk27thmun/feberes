@@ -1,0 +1,94 @@
+---
+import Icon from './Icon.astro';
+import { SITE } from '../data/site';
+import { CATEGORIES } from '../data/products';
+import { useTranslations, localePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const productLinks = CATEGORIES.filter((c) => c.id !== 'all').map((c) => ({
+  label: c.label[lang],
+  href: localePath(lang, `/products?cat=${c.id}`)
+}));
+
+const companyLinks = [
+  { label: t('footer.about'), href: localePath(lang, '/factory') },
+  { label: t('footer.factory'), href: localePath(lang, '/factory') },
+  { label: t('nav.products'), href: localePath(lang, '/products') },
+  { label: t('footer.quote'), href: localePath(lang, '/contact') }
+];
+
+const waLink = `https://wa.me/${SITE.whatsappRaw}`;
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <span class="logo-mark">{SITE.brandMark}</span>
+          <span class="logo-text">
+            <b>FEBERES</b>
+            <span>{lang === 'zh' ? '河北菲泊丝化纤材料' : 'Chemical Fiber Materials'}</span>
+          </span>
+        </div>
+        <p>{SITE.name[lang]}</p>
+        <p style="margin-top:10px;color:rgba(255,255,255,.6)">{SITE.tagline[lang]}</p>
+      </div>
+
+      <div>
+        <h4>{t('footer.products')}</h4>
+        <ul class="footer-links">
+          {productLinks.map((l) => (
+            <li><a href={l.href}>{l.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h4>{t('footer.company')}</h4>
+        <ul class="footer-links">
+          {companyLinks.map((l) => (
+            <li><a href={l.href}>{l.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h4>{t('footer.contact')}</h4>
+        <ul class="footer-contact">
+          <li>
+            <Icon name="mail" size={17} />
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          </li>
+          <li>
+            <Icon name="phone" size={17} />
+            <a href={`tel:+${SITE.phoneRaw}`}>{SITE.phone}</a>
+          </li>
+          <li>
+            <Icon name="whatsapp" size={17} />
+            <a href={waLink} target="_blank" rel="noopener">{SITE.whatsapp}</a>
+          </li>
+          <li>
+            <Icon name="map-pin" size={17} />
+            <span>{SITE.address[lang]}</span>
+          </li>
+          <li>
+            <Icon name="clock" size={17} />
+            <span>{SITE.hours[lang]}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>&copy; <span id="year">2026</span> {SITE.name[lang]} · {t('footer.rights')}</span>
+      <span>{t('common.demoNotice')}</span>
+    </div>
+  </div>
+</footer>

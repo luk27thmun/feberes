@@ -1,0 +1,235 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import PageHero from '../../components/PageHero.astro';
+import { SITE, IMG } from '../../data/site';
+import { PRODUCTS } from '../../data/products';
+import { locales, useTranslations, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
+
+const waText = encodeURIComponent(
+  tr('您好，我想咨询化纤纱线产品的报价。', 'Hello, I would like to ask about your chemical fiber yarn products.')
+);
+const waLink = `https://wa.me/${SITE.whatsappRaw}?text=${waText}`;
+const mailLink = `mailto:${SITE.email}`;
+---
+
+<Layout
+  lang={lang}
+  path="/contact"
+  title={tr('联系我们', 'Contact Us')}
+  description={tr(
+    `联系河北菲泊丝化纤材料有限公司：邮箱 ${SITE.email}，电话 ${SITE.phone}，WhatsApp ${SITE.whatsapp}。`,
+    `Contact Hebei Feberes Chemical Fiber Materials Co., Ltd.: email ${SITE.email}, phone ${SITE.phone}, WhatsApp ${SITE.whatsapp}.`
+  )}
+  image={IMG.warehouse}
+>
+  <PageHero
+    lang={lang}
+    image={IMG.warehouse}
+    title={tr('联系我们', 'Contact Us')}
+    subtitle={tr(
+      '把您的目标规格、数量与目的港告诉我们，一个工作日内回复报价与样品方案。',
+      'Tell us your target specification, quantity and destination port — we reply with quotation and sample plan within one working day.'
+    )}
+    crumbs={[{ label: tr('联系我们', 'Contact') }]}
+  />
+
+  <!-- 联系方式 -->
+  <section class="section">
+    <div class="container">
+      <div class="contact-cards">
+        <div class="card contact-card">
+          <div class="ico"><Icon name="mail" size={22} /></div>
+          <div>
+            <h3>{t('contact.email')}</h3>
+            <p class="value"><a href={mailLink}>{SITE.email}</a></p>
+            <p class="hint">{tr('业务询盘与单证资料对接', 'For inquiries and shipping documents')}</p>
+          </div>
+        </div>
+
+        <div class="card contact-card">
+          <div class="ico"><Icon name="phone" size={22} /></div>
+          <div>
+            <h3>{t('contact.phone')}</h3>
+            <p class="value"><a href={`tel:+${SITE.phoneRaw}`}>{SITE.phone}</a></p>
+            <p class="hint">{SITE.hours[lang]}</p>
+          </div>
+        </div>
+
+        <div class="card contact-card">
+          <div class="ico"><Icon name="whatsapp" size={22} /></div>
+          <div>
+            <h3>{t('contact.whatsapp')}</h3>
+            <p class="value"><a href={waLink} target="_blank" rel="noopener">{SITE.whatsapp}</a></p>
+            <p class="hint">{tr('海外客户推荐，可发图片与语音', 'Recommended for overseas customers — photos & voice messages welcome')}</p>
+          </div>
+        </div>
+
+        <div class="card contact-card">
+          <div class="ico"><Icon name="map-pin" size={22} /></div>
+          <div>
+            <h3>{t('contact.address')}</h3>
+            <p class="value">{SITE.address[lang]}</p>
+            <p class="hint">{SITE.addressNote[lang]}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 询盘表单 -->
+  <section class="section section-soft">
+    <div class="container">
+      <div class="grid grid-2" style="grid-template-columns:1.25fr 1fr;align-items:start">
+        <div class="card" style="padding:32px">
+          <h2 style="font-size:22px">{t('form.title')}</h2>
+          <p style="margin-top:10px;color:var(--ink-2);font-size:14.5px">
+            {tr('带 * 的为必填项。提交后将调起您的邮件客户端，内容自动预填。', 'Fields marked * are required. Submitting opens your email client with the content pre-filled.')}
+          </p>
+
+          <form class="form" id="inquiry-form" style="margin-top:26px" data-email={SITE.email} novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label for="name">{t('form.name')} <span class="req">*</span></label>
+                <input id="name" name="name" type="text" placeholder={t('form.namePh')} required />
+              </div>
+              <div class="field">
+                <label for="company">{t('form.company')}</label>
+                <input id="company" name="company" type="text" placeholder={t('form.companyPh')} />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="email">{t('form.email')} <span class="req">*</span></label>
+                <input id="email" name="email" type="email" placeholder={t('form.emailPh')} required />
+              </div>
+              <div class="field">
+                <label for="phone">{t('form.phone')}</label>
+                <input id="phone" name="phone" type="text" placeholder={t('form.phonePh')} />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="country">{t('form.country')}</label>
+                <input id="country" name="country" type="text" placeholder={t('form.countryPh')} />
+              </div>
+              <div class="field">
+                <label for="qty">{t('form.qty')}</label>
+                <input id="qty" name="qty" type="text" placeholder={t('form.qtyPh')} />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="product">{t('form.product')}</label>
+              <select id="product" name="product">
+                <option value="">{tr('请选择产品（可多选时请在留言说明）', 'Please select a product')}</option>
+                {PRODUCTS.map((p) => (
+                  <option value={p.slug}>{p.name[lang]}（{p.deniers.split(' · ')[0]}）</option>
+                ))}
+                <option value="other">{tr('其他 / 定制需求', 'Other / Customized')}</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="message">{t('form.message')} <span class="req">*</span></label>
+              <textarea id="message" name="message" placeholder={t('form.messagePh')} required></textarea>
+            </div>
+
+            <button class="btn btn-primary btn-block" type="submit">
+              {t('form.submit')}
+              <Icon name="arrow-right" size={18} />
+            </button>
+            <p class="form-note">{t('form.note')}</p>
+          </form>
+        </div>
+
+        <div style="display:grid;gap:22px">
+          <div class="card" style="padding:28px">
+            <h3 style="font-size:17px">{tr('更快的联系方式', 'Faster ways to reach us')}</h3>
+            <p style="margin-top:10px;color:var(--ink-2);font-size:14.5px">
+              {tr('如需快速沟通规格与样品，建议直接通过 WhatsApp 或电话联系。', 'For quick discussion on specifications and samples, WhatsApp or a phone call is fastest.')}
+            </p>
+            <div style="display:grid;gap:12px;margin-top:20px">
+              <a class="btn btn-accent" href={waLink} target="_blank" rel="noopener">
+                <Icon name="whatsapp" size={18} />
+                {t('common.talkWhatsapp')}
+              </a>
+              <a class="btn btn-outline" href={mailLink}>
+                <Icon name="mail" size={18} />
+                {t('common.sendEmail')}
+              </a>
+            </div>
+            <ul style="display:grid;gap:12px;margin-top:24px;font-size:14.5px;color:var(--ink-2)">
+              <li style="display:flex;gap:10px"><Icon name="clock" size={17} />{SITE.hours[lang]}</li>
+              <li style="display:flex;gap:10px"><Icon name="globe" size={17} />{tr('报价币种：USD / EUR / CNY', 'Quotation currency: USD / EUR / CNY')}</li>
+              <li style="display:flex;gap:10px"><Icon name="truck" size={17} />{tr('装运口岸：天津 / 青岛 / 上海', 'Loading port: Tianjin / Qingdao / Shanghai')}</li>
+            </ul>
+          </div>
+
+          <div class="license-box" style="min-height:auto">
+            <Icon name="document" size={34} />
+            <strong style="margin-top:12px">{tr('营业执照（待插入图片）', 'Business License (image pending)')}</strong>
+            <small>
+              {tr(
+                '把营业执照图片放到 public/ 目录后，把这里替换成 <img src="/营业执照.jpg" alt="营业执照"> 即可。',
+                'Put the image into the public/ folder, then replace this block with <img src="/license.jpg" alt="Business License">.'
+              )}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('inquiry-form') as HTMLFormElement | null;
+      if (!form) return;
+
+      const select = form.querySelector<HTMLSelectElement>('#product');
+
+      // 从产品详情页跳转时预选产品：/contact?product=<slug>
+      const slug = new URLSearchParams(window.location.search).get('product');
+      if (slug && select) {
+        const exists = Array.from(select.options).some((o) => o.value === slug);
+        if (exists) select.value = slug;
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const get = (key: string) => String(data.get(key) || '').trim();
+
+        const selected = select?.selectedOptions[0];
+        const productText = selected && selected.value ? selected.text : '';
+
+        const subject = `Inquiry: ${productText || 'Chemical fiber yarn'} — ${get('company') || get('name') || 'New enquiry'}`;
+        const body = [
+          `Name: ${get('name')}`,
+          `Company: ${get('company')}`,
+          `Email: ${get('email')}`,
+          `Phone / WhatsApp: ${get('phone')}`,
+          `Country / Region: ${get('country')}`,
+          `Product: ${productText}`,
+          `Quantity: ${get('qty')}`,
+          '',
+          'Message:',
+          get('message')
+        ].join('\n');
+
+        const email = form.dataset.email || '';
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      });
+    });
+  </script>
+</Layout>

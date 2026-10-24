@@ -1,0 +1,118 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import { SITE, IMG } from '../data/site';
+import { locales, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** 当前页面在该语言下的路径，如 '/'、'/products'、'/products/polyester-dty-yarn' */
+  path?: string;
+  image?: string;
+}
+
+const { lang, title, description, path = '/', image = IMG.hero } = Astro.props;
+
+const siteName = SITE.name[lang];
+const fullTitle = `${title} | ${siteName}`;
+const origin = Astro.site ? Astro.site.origin : 'https://example.github.io';
+const cleanPath = path === '/' ? '' : path;
+const canonical = `${origin}/${lang}${cleanPath}`;
+
+const alternates = locales.map((l) => ({
+  lang: l === 'zh' ? 'zh-CN' : 'en',
+  href: `${origin}/${l}${cleanPath}`
+}));
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name.en,
+  alternateName: SITE.name.zh,
+  url: `${origin}/${lang}`,
+  email: SITE.email,
+  telephone: `+${SITE.phoneRaw}`,
+  description: SITE.tagline.en,
+  address: {
+    '@type': 'PostalAddress',
+    addressCountry: 'CN',
+    addressRegion: 'Hebei'
+  }
+};
+---
+
+<!doctype html>
+<html lang={lang === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={`${origin}/en${cleanPath}`} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#0a4d8c" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(organization)} />
+  </head>
+  <body>
+    <Header lang={lang} path={path} />
+
+    <main>
+      <slot />
+    </main>
+
+    <Footer lang={lang} />
+    <WhatsAppFloat lang={lang} />
+
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+      <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
+      <img src="" alt="" />
+    </div>
+
+    <script>
+      // 移动端导航
+      const toggle = document.querySelector('.nav-toggle');
+      const mobileNav = document.querySelector('.mobile-nav');
+      toggle?.addEventListener('click', () => mobileNav?.classList.toggle('is-open'));
+
+      // 图片灯箱
+      const lb = document.getElementById('lightbox');
+      const lbImg = lb?.querySelector('img');
+      document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement | null;
+        const opener = target?.closest('[data-lightbox]');
+        if (opener && lb && lbImg) {
+          lbImg.src = opener.getAttribute('data-lightbox') || '';
+          lbImg.alt = opener.getAttribute('data-lightbox-alt') || '';
+          lb.classList.add('is-open');
+          return;
+        }
+        if (target?.closest('.lightbox-close') || target === lb) {
+          lb?.classList.remove('is-open');
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') lb?.classList.remove('is-open');
+      });
+
+      // 页脚年份
+      const yearEl = document.getElementById('year');
+      if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+    </script>
+  </body>
+</html>

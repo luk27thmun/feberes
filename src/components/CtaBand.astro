@@ -1,0 +1,42 @@
+---
+import Icon from './Icon.astro';
+import { SITE } from '../data/site';
+import { useTranslations, localePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  text?: string;
+}
+
+const { lang, title, text } = Astro.props;
+const t = useTranslations(lang);
+
+const heading = title ?? (lang === 'zh' ? '需要报价或样品？' : 'Need a quotation or sample?');
+const body =
+  text ??
+  (lang === 'zh'
+    ? '把您的目标规格、数量与目的港发给我们，我们会在一个工作日内提供正式报价与样品方案。'
+    : 'Send us your target specification, quantity and destination port — we will reply with a formal quotation and sample plan within one working day.');
+
+const waLink = `https://wa.me/${SITE.whatsappRaw}`;
+---
+
+<section class="cta-band">
+  <div class="container inner">
+    <div>
+      <h2>{heading}</h2>
+      <p>{body}</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-white" href={localePath(lang, '/contact')}>
+        {t('common.requestQuote')}
+        <Icon name="arrow-right" size={18} />
+      </a>
+      <a class="btn btn-line" href={waLink} target="_blank" rel="noopener">
+        <Icon name="whatsapp" size={18} />
+        {t('common.talkWhatsapp')}
+      </a>
+    </div>
+  </div>
+</section>

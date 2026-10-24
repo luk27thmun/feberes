@@ -1,0 +1,61 @@
+---
+import { SITE } from '../data/site';
+import { useTranslations, localePath, switchLang, localeNames, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  path?: string;
+}
+
+const { lang, path = '/' } = Astro.props;
+const t = useTranslations(lang);
+const other = switchLang(lang);
+const otherHref = localePath(other, path);
+
+const nav = [
+  { href: '/', label: t('nav.home') },
+  { href: '/products', label: t('nav.products') },
+  { href: '/factory', label: t('nav.factory') },
+  { href: '/contact', label: t('nav.contact') }
+];
+
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href={localePath(lang, '/')} aria-label={SITE.name[lang]}>
+      <span class="logo-mark">{SITE.brandMark}</span>
+      <span class="logo-text">
+        <b>FEBERES</b>
+        <span>{lang === 'zh' ? '河北菲泊丝化纤材料' : 'Chemical Fiber Materials'}</span>
+      </span>
+    </a>
+
+    <nav class="nav">
+      {nav.map((item) => (
+        <a href={localePath(lang, item.href)} class={isActive(item.href) ? 'is-active' : ''}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="header-actions">
+      <div class="lang-switch" role="group" aria-label={t('common.language')}>
+        <a href={localePath(lang, path)} class="is-active">{localeNames[lang]}</a>
+        <a href={otherHref}>{localeNames[other]}</a>
+      </div>
+      <a class="btn btn-primary btn-sm" href={localePath(lang, '/contact')}>{t('nav.quote')}</a>
+      <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    {nav.map((item) => (
+      <a href={localePath(lang, item.href)}>{item.label}</a>
+    ))}
+    <a href={otherHref}>{localeNames[other]}</a>
+  </nav>
+</header>

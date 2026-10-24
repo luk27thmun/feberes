@@ -1,0 +1,30 @@
+---
+import Icon from './Icon.astro';
+import { categoryLabel, type Product } from '../data/products';
+import { useTranslations, localePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  product: Product;
+  lang: Lang;
+}
+
+const { product, lang } = Astro.props;
+const t = useTranslations(lang);
+const href = localePath(lang, `/products/${product.slug}`);
+---
+
+<article class="card product-card">
+  <a class="thumb" href={href} aria-label={product.name[lang]}>
+    <img src={product.image} alt={product.name[lang]} loading="lazy" width="800" height="800" />
+  </a>
+  <div class="card-body">
+    <span class="tag">{categoryLabel(product.category, lang)}</span>
+    <h3><a href={href}>{product.name[lang]}</a></h3>
+    <p class="en-name">{product.subtitle[lang]}</p>
+    <p class="desc">{product.desc[lang]}</p>
+    <div class="card-foot">
+      <span class="tag tag-brand">{product.deniers.split(' · ')[0]}</span>
+      <a class="more" href={href}>{t('common.viewDetail')}</a>
+    </div>
+  </div>
+</article>

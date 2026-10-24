@@ -1,0 +1,97 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ProductCard from '../../../components/ProductCard.astro';
+import CtaBand from '../../../components/CtaBand.astro';
+import PageHero from '../../../components/PageHero.astro';
+import { IMG } from '../../../data/site';
+import { PRODUCTS, CATEGORIES } from '../../../data/products';
+import { locales, useTranslations, type Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
+
+const initialCat = 'all';
+---
+
+<Layout
+  lang={lang}
+  path="/products"
+  title={tr('产品中心', 'Products')}
+  description={tr(
+    '涤纶 DTY / FDY / POY、涤纶缝纫线、锦纶弹力丝、氨纶包覆纱与再生涤纶长丝等化纤纱线产品目录与规格参数。',
+    'Product catalog and specifications of polyester DTY / FDY / POY, sewing thread, nylon DTY, spandex covered yarn and recycled polyester yarn.'
+  )}
+>
+  <PageHero
+    lang={lang}
+    image={IMG.lineWinding}
+    title={tr('产品中心', 'Product Catalog')}
+    subtitle={tr(
+      '共 8 类示范产品，覆盖从纺丝、加弹到加捻与包覆的化纤纱线品类，支持整柜与混装。',
+      'Eight sample product lines covering spun, textured, twisted and covered chemical fiber yarn — full container or mixed loading.'
+    )}
+    crumbs={[{ label: tr('产品中心', 'Products') }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="filter-bar" role="group" aria-label={t('common.filter')}>
+        {CATEGORIES.map((c) => (
+          <button
+            type="button"
+            class:list={['chip', c.id === initialCat ? 'is-active' : '']}
+            data-cat={c.id}
+          >
+            {c.label[lang]}
+          </button>
+        ))}
+      </div>
+
+      <div class="grid grid-4" id="product-grid">
+        {PRODUCTS.map((p) => (
+          <div data-category={p.category}>
+            <ProductCard product={p} lang={lang} />
+          </div>
+        ))}
+      </div>
+
+      <div class="empty" id="empty-state" style="display:none">{t('common.empty')}</div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+
+  <script>
+    const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.chip[data-cat]'));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-category]'));
+    const empty = document.getElementById('empty-state');
+
+    function apply(cat: string) {
+      let visible = 0;
+      cards.forEach((card) => {
+        const show = cat === 'all' || card.dataset.category === cat;
+        card.style.display = show ? '' : 'none';
+        if (show) visible += 1;
+      });
+      chips.forEach((chip) => chip.classList.toggle('is-active', chip.dataset.cat === cat));
+      if (empty) empty.style.display = visible ? 'none' : 'block';
+
+      const url = new URL(window.location.href);
+      if (cat === 'all') url.searchParams.delete('cat');
+      else url.searchParams.set('cat', cat);
+      window.history.replaceState({}, '', url);
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => apply(chip.dataset.cat || 'all'));
+    });
+
+    const initial = new URLSearchParams(window.location.search).get('cat') || 'all';
+    apply(initial);
+  </script>
+</Layout>

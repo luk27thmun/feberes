@@ -1,0 +1,218 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import PageHero from '../../components/PageHero.astro';
+import { SITE, IMG, STATS } from '../../data/site';
+import { locales, localePath, useTranslations, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return locales.map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
+
+const gallery = [
+  { src: IMG.factory, caption: tr('厂区外观', 'Factory exterior') },
+  { src: IMG.lineDTY, caption: tr('DTY 加弹车间', 'DTY texturing workshop') },
+  { src: IMG.lineWinding, caption: tr('自动络筒工位', 'Automatic winding section') },
+  { src: IMG.lab, caption: tr('质检实验室', 'Quality control laboratory') },
+  { src: IMG.warehouse, caption: tr('成品仓与装箱区', 'Finished goods warehouse') },
+  { src: IMG.hero, caption: tr('生产基地全景', 'Production base overview') }
+];
+
+const capacity = [
+  { k: tr('加弹机', 'Texturing machines'), v: tr('48 台（示范数据）', '48 units (sample data)') },
+  { k: tr('高速纺丝线', 'High-speed spinning lines'), v: tr('12 条（示范数据）', '12 lines (sample data)') },
+  { k: tr('倍捻机', 'Two-for-one twisters'), v: tr('60 台（示范数据）', '60 units (sample data)') },
+  { k: tr('年产能', 'Annual capacity'), v: tr('30,000 吨（示范数据）', '30,000 tons (sample data)') },
+  { k: tr('常规交期', 'Standard lead time'), v: tr('15 – 30 天', '15 – 30 days') },
+  { k: tr('出口口岸', 'Loading port'), v: tr('天津 / 青岛 / 上海', 'Tianjin / Qingdao / Shanghai') }
+];
+
+const qcSteps = [
+  {
+    icon: 'document',
+    title: tr('原料入厂检验', 'Incoming material inspection'),
+    text: tr('切片、油剂与纸管按批次验收，记录批号并留档。', 'Chips, finishes and tubes are inspected by batch, with records kept on file.')
+  },
+  {
+    icon: 'factory',
+    title: tr('在线过程监控', 'In-line process monitoring'),
+    text: tr('纺丝与加弹工序在线监测张力、温度与断头率。', 'Tension, temperature and breakage rate are monitored in-line during spinning and texturing.')
+  },
+  {
+    icon: 'shield',
+    title: tr('成品指标抽检', 'Finished product testing'),
+    text: tr('抽检线密度、强力、伸长率、含油率与染色均匀性。', 'Sampling tests for linear density, tenacity, elongation, oil pickup and dyeing uniformity.')
+  },
+  {
+    icon: 'award',
+    title: tr('留样与可追溯', 'Sample retention & traceability'),
+    text: tr('每批次留样不少于 12 个月，实现订单全流程追溯。', 'Samples retained for at least 12 months for full order traceability.')
+  }
+];
+---
+
+<Layout
+  lang={lang}
+  path="/factory"
+  title={tr('工厂实力', 'Our Factory')}
+  description={tr(
+    '河北菲泊丝化纤材料有限公司自有生产基地，配备高速纺丝线、加弹机、倍捻机与质检实验室，年产能约 30,000 吨。',
+    'Hebei Feberes Chemical Fiber Materials Co., Ltd. operates its own production base with high-speed spinning lines, texturing machines, twisters and an in-house laboratory.'
+  )}
+  image={IMG.factory}
+>
+  <PageHero
+    lang={lang}
+    image={IMG.factory}
+    title={tr('工厂实力', 'Our Factory')}
+    subtitle={tr(
+      '自有生产基地，从原料检验到成品装箱全流程自主把控，为稳定供货提供保障。',
+      'An own production base with full process control from raw material inspection to export loading.'
+    )}
+    crumbs={[{ label: tr('工厂实力', 'Our Factory') }]}
+  />
+
+  <!-- 公司简介 -->
+  <section class="section">
+    <div class="container split">
+      <div class="split-media">
+        <img src={IMG.factory} alt={tr('厂区外观', 'Factory exterior')} loading="lazy" />
+      </div>
+      <div>
+        <span class="eyebrow">{tr('关于我们', 'About Us')}</span>
+        <h2>{SITE.name[lang]}</h2>
+        <p class="section-sub">
+          {tr(
+            '公司专注于化纤长丝与纱线的生产与出口，主营涤纶 DTY、FDY、POY、涤纶缝纫线、锦纶弹力丝、氨纶包覆纱以及再生涤纶长丝等产品。生产基地配备从纺丝、加弹到加捻、包覆的完整产线，并设有独立质检实验室，为服装、家纺、箱包、产业用纺织品等下游行业提供稳定原料。',
+            'We focus on the manufacture and export of chemical fiber filament and yarn, including polyester DTY, FDY and POY, polyester sewing thread, nylon DTY, spandex covered yarn and recycled polyester yarn. Our production base covers the complete process from spinning and texturing to twisting and covering, supported by an in-house laboratory, serving apparel, home textile, luggage and technical textile industries.'
+          )}
+        </p>
+        <ul class="check-list">
+          <li><Icon name="check" size={17} />{tr('产品主要出口欧洲、北美、东南亚、中东与南美市场', 'Main markets: Europe, North America, Southeast Asia, Middle East and South America')}</li>
+          <li><Icon name="check" size={17} />{tr('熟悉 FOB / CIF 条款与全套出口单证办理', 'Experienced with FOB / CIF terms and export documentation')}</li>
+          <li><Icon name="check" size={17} />{tr('可按客户样布或色卡定制开发', 'Custom development based on your sample fabric or color card')}</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 数据 -->
+  <section class="section section-soft section-sm">
+    <div class="container">
+      <div class="stats">
+        {STATS.map((s) => (
+          <div class="stat stat-light">
+            <b>{s.value}</b>
+            <span>{s.label[lang]}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 车间图集 -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{tr('厂区实景', 'Factory Tour')}</span>
+        <h2 class="section-title">{tr('生产与质检现场', 'Production & Quality Control')}</h2>
+        <p class="section-sub">
+          {tr('点击图片可放大查看。以下为示范图片，后续替换为真实厂区照片。', 'Click an image to enlarge. Images below are samples to be replaced with real photos.')}
+        </p>
+      </div>
+
+      <div class="gallery">
+        {gallery.map((g) => (
+          <figure class="gallery-item" data-lightbox={g.src} data-lightbox-alt={g.caption}>
+            <img src={g.src} alt={g.caption} loading="lazy" />
+            <figcaption>{g.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 产能与质检 -->
+  <section class="section section-soft">
+    <div class="container">
+      <div class="grid grid-2" style="align-items:start">
+        <div class="card" style="padding:28px">
+          <table class="spec-table">
+            <caption>{tr('产能与交付能力', 'Capacity & Delivery')}</caption>
+            <tbody>
+              {capacity.map((row) => (
+                <tr>
+                  <th>{row.k}</th>
+                  <td>{row.v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="padding:28px">
+          <h2 style="font-size:20px">{tr('质量控制流程', 'Quality Control Process')}</h2>
+          <div style="display:grid;gap:18px;margin-top:20px">
+            {qcSteps.map((s) => (
+              <div style="display:flex;gap:14px">
+                <div class="feature-icon" style="width:40px;height:40px;margin:0;flex-shrink:0">
+                  <Icon name={s.icon} size={20} />
+                </div>
+                <div>
+                  <h3 style="font-size:15.5px">{s.title}</h3>
+                  <p style="margin-top:6px;font-size:14px;color:var(--ink-2)">{s.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 资质与证照 -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{tr('资质证照', 'Certificates & Licenses')}</span>
+        <h2 class="section-title">{tr('合规文件与认证', 'Compliance Documents')}</h2>
+        <p class="section-sub">
+          {tr(
+            '营业执照与认证证书原件可由业务代表按需提供。下方为占位区域，请替换为公司真实证照扫描件。',
+            'Business license and certificates can be provided on request. The area below is a placeholder — replace it with the real scanned documents.'
+          )}
+        </p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="license-box">
+          <Icon name="document" size={40} />
+          <strong style="margin-top:14px">{tr('营业执照（待插入图片）', 'Business License (image pending)')}</strong>
+          <small>
+            {tr(
+              '替换方式：把营业执照图片放到 public/ 目录，然后将此处改为 <img src="/营业执照.jpg" alt="营业执照">',
+              'To add: place the image in the public/ folder, then replace this block with <img src="/license.jpg" alt="Business License">'
+            )}
+          </small>
+        </div>
+        <div class="license-box">
+          <Icon name="award" size={40} />
+          <strong style="margin-top:14px">{tr('体系与产品认证（待插入图片）', 'System & Product Certificates (image pending)')}</strong>
+          <small>
+            {tr(
+              '可放置 ISO 9001、GRS、OEKO-TEX 等证书扫描件，建议统一尺寸后并排展示。',
+              'Place scanned ISO 9001, GRS, OEKO-TEX certificates here — resize them to a consistent size for a tidy grid.'
+            )}
+          </small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</Layout>

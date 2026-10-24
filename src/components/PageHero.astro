@@ -1,0 +1,38 @@
+---
+import { IMG } from '../data/site';
+import { localePath, type Lang } from '../i18n/ui';
+
+interface Crumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  lang: Lang;
+  title: string;
+  subtitle?: string;
+  image?: string;
+  crumbs?: Crumb[];
+}
+
+const { lang, title, subtitle, image = IMG.factory, crumbs = [] } = Astro.props;
+---
+
+<section class="page-hero">
+  <img src={image} alt="" aria-hidden="true" />
+  <div class="container inner">
+    {crumbs.length > 0 && (
+      <nav class="breadcrumb">
+        <a href={localePath(lang, '/')}>{lang === 'zh' ? '首页' : 'Home'}</a>
+        {crumbs.map((c) => (
+          <>
+            <span>/</span>
+            {c.href ? <a href={c.href}>{c.label}</a> : <span>{c.label}</span>}
+          </>
+        ))}
+      </nav>
+    )}
+    <h1>{title}</h1>
+    {subtitle && <p>{subtitle}</p>}
+  </div>
+</section>

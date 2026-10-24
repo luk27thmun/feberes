@@ -1,0 +1,162 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Icon from '../../../components/Icon.astro';
+import ProductCard from '../../../components/ProductCard.astro';
+import CtaBand from '../../../components/CtaBand.astro';
+import PageHero from '../../../components/PageHero.astro';
+import { SITE } from '../../../data/site';
+import { PRODUCTS, categoryLabel } from '../../../data/products';
+import { locales, localePath, useTranslations, type Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return locales.flatMap((lang) =>
+    PRODUCTS.map((product) => ({
+      params: { lang, slug: product.slug },
+      props: { product }
+    }))
+  );
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const { product } = Astro.props;
+const t = useTranslations(lang);
+const tr = (zh: string, en: string) => (lang === 'zh' ? zh : en);
+
+const related = [
+  ...PRODUCTS.filter((p) => p.category === product.category && p.slug !== product.slug),
+  ...PRODUCTS.filter((p) => p.category !== product.category && p.slug !== product.slug)
+].slice(0, 4);
+
+const waText = encodeURIComponent(
+  tr(
+    `您好，我想了解 ${product.name.zh}（${product.deniers}）的报价与样品。`,
+    `Hello, I would like to get a quotation and sample for ${product.name.en} (${product.deniers}).`
+  )
+);
+const waLink = `https://wa.me/${SITE.whatsappRaw}?text=${waText}`;
+const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
+const altName = otherLang === 'en' ? product.name.en : product.name.zh;
+const quoteLink = `${localePath(lang, '/contact')}?product=${product.slug}`;
+---
+
+<Layout
+  lang={lang}
+  path={`/products/${product.slug}`}
+  title={product.name[lang]}
+  description={product.desc[lang]}
+  image={product.image}
+>
+  <PageHero
+    lang={lang}
+    image={product.image}
+    title={product.name[lang]}
+    subtitle={product.subtitle[lang]}
+    crumbs={[
+      { label: tr('产品中心', 'Products'), href: localePath(lang, '/products') },
+      { label: product.name[lang] }
+    ]}
+  />
+
+  <!-- 产品概览 -->
+  <section class="section">
+    <div class="container detail">
+      <div class="detail-media">
+        <img src={product.image} alt={product.name[lang]} width="900" height="900" />
+      </div>
+      <div>
+        <span class="tag">{categoryLabel(product.category, lang)}</span>
+        <h1 style="margin-top:16px">{product.name[lang]}</h1>
+        <p class="en-title">{altName}</p>
+        <p class="lead">{product.desc[lang]}</p>
+
+        <div class="meta-list">
+          <span class="tag tag-brand">{t('common.deniers')}：{product.deniers}</span>
+        </div>
+
+        <table class="spec-table" style="margin-top:26px">
+          <tbody>
+            {product.specs.slice(0, 5).map((row) => (
+              <tr>
+                <th>{row.k[lang]}</th>
+                <td>{row.v[lang]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div class="detail-actions">
+          <a class="btn btn-primary" href={quoteLink}>
+            {t('common.requestQuote')}
+            <Icon name="arrow-right" size={18} />
+          </a>
+          <a class="btn btn-outline" href={waLink} target="_blank" rel="noopener">
+            <Icon name="whatsapp" size={18} />
+            {t('common.talkWhatsapp')}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 规格与应用 -->
+  <section class="section section-soft">
+    <div class="container">
+      <div class="grid grid-2" style="align-items:start">
+        <div class="card" style="padding:28px">
+          <table class="spec-table">
+            <caption>{t('common.specs')}</caption>
+            <tbody>
+              {product.specs.map((row) => (
+                <tr>
+                  <th>{row.k[lang]}</th>
+                  <td>{row.v[lang]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="padding:28px">
+          <h2 style="font-size:20px">{t('common.applications')}</h2>
+          <p style="margin-top:10px;color:var(--ink-3);font-size:14px">
+            {tr('以下为该产品常见的下游应用场景，如有特定用途欢迎与我们确认。', 'Typical downstream applications — contact us to confirm suitability for your specific use.')}
+          </p>
+          <ul class="app-list" style="margin-top:20px">
+            {product.applications[lang].map((a) => (
+              <li>{a}</li>
+            ))}
+          </ul>
+
+          <div style="margin-top:30px;padding-top:24px;border-top:1px solid var(--line)">
+            <h3 style="font-size:16px">{t('common.inquiryTitle')}</h3>
+            <p style="margin-top:10px;color:var(--ink-2);font-size:14.5px">{t('common.inquiryText')}</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px">
+              <a class="btn btn-primary btn-sm" href={quoteLink}>{t('common.requestQuote')}</a>
+              <a class="btn btn-outline btn-sm" href={`mailto:${SITE.email}?subject=${encodeURIComponent(product.name.en)}`}>
+                <Icon name="mail" size={16} />
+                {t('common.sendEmail')}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 相关产品 -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">{tr('相关推荐', 'Related')}</span>
+        <h2 class="section-title">{t('common.relatedProducts')}</h2>
+      </div>
+      <div class="grid grid-4">
+        {related.map((p) => (
+          <ProductCard product={p} lang={lang} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</Layout>
