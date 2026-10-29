@@ -1,6 +1,9 @@
 ---
-// 语言入口页：根据浏览器语言自动跳转到 /en 或 /zh
-const base = import.meta.env.BASE_URL; // '/' 或部署到项目仓库时的 '/repo/'
+// 语言入口页：按浏览器语言跳转到 /en/ 或 /zh/，并为爬虫提供 canonical、hreflang 与可点击兜底链接
+const site = Astro.site ?? new URL('https://feberes.com');
+const base = import.meta.env.BASE_URL;
+const enUrl = new URL('/en/', site).href;
+const zhUrl = new URL('/zh/', site).href;
 ---
 
 <!doctype html>
@@ -8,8 +11,12 @@ const base = import.meta.env.BASE_URL; // '/' 或部署到项目仓库时的 '/r
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Feberes · 河北菲泊丝化纤材料有限公司</title>
+    <title>Feberes — Chemical Fiber Yarn Manufacturer &amp; Exporter</title>
     <meta name="description" content="Hebei Feberes Chemical Fiber Materials Co., Ltd. — chemical fiber yarn manufacturer and exporter. 河北菲泊丝化纤材料有限公司，化纤长丝与纱线出口制造商。" />
+    <link rel="canonical" href={enUrl} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="zh-CN" href={zhUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <script is:inline define:vars={{ base }}>
       (function () {
@@ -24,6 +31,7 @@ const base = import.meta.env.BASE_URL; // '/' 或部署到项目仓库时的 '/r
         location.replace(base + lang + '/');
       })();
     </script>
+    <noscript><meta http-equiv="refresh" content="0; url=/en/" /></noscript>
   </head>
   <body style="font-family:system-ui,-apple-system,'Segoe UI','Microsoft YaHei',sans-serif;padding:40px;color:#0a2540">
     <p>
@@ -31,4 +39,3 @@ const base = import.meta.env.BASE_URL; // '/' 或部署到项目仓库时的 '/r
     </p>
   </body>
 </html>
-

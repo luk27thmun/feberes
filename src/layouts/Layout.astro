@@ -17,23 +17,29 @@ interface Props {
 
 const { lang, title, description, path = '/', image = IMG.hero } = Astro.props;
 
+const site = Astro.site ?? new URL('https://feberes.com');
 const siteName = SITE.name[lang];
 const fullTitle = `${title} | ${siteName}`;
-const origin = Astro.site ? Astro.site.origin : 'https://example.github.io';
-const cleanPath = path === '/' ? '' : path;
-const canonical = `${origin}/${lang}${cleanPath}`;
+
+// canonical / hreflang 均由当前页面 URL 派生：丢弃查询参数，统一补结尾斜杠
+const urlPath = Astro.url.pathname;
+const rest = urlPath.replace(/^\/(en|zh)/, '').replace(/\/+$/, '');
+const suffix = rest === '' ? '/' : `${rest}/`;
+const canonical = new URL(`/${lang}${suffix}`, site).href;
+const defaultHref = new URL(`/en${suffix}`, site).href;
 
 const alternates = locales.map((l) => ({
   lang: l === 'zh' ? 'zh-CN' : 'en',
-  href: `${origin}/${l}${cleanPath}`
+  href: new URL(`/${l}${suffix}`, site).href
 }));
 
 const organization = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
+  '@id': `${site.origin}/#organization`,
   name: SITE.name.en,
   alternateName: SITE.name.zh,
-  url: `${origin}/${lang}`,
+  url: `${site.origin}/`,
   email: SITE.email,
   telephone: `+${SITE.phoneRaw}`,
   description: SITE.tagline.en,
@@ -54,7 +60,7 @@ const organization = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
-    <link rel="alternate" hreflang="x-default" href={`${origin}/en${cleanPath}`} />
+    <link rel="alternate" hreflang="x-default" href={defaultHref} />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
